@@ -22,7 +22,6 @@ static uint16_t icmp_checksum(void *data, int len) {
 
 static void	setup_packet(t_list *list, struct iovec *iov, char *recv_buffer)
 {
-	strcpy(list->packet.msg, "Dit is een hele mooie line4343!");
 	list->packet.header.icmp_type = ICMP_ECHO;
 	list->packet.header.icmp_hun.ih_idseq.icd_id = getuid();
 	list->packet.header.icmp_hun.ih_idseq.icd_seq = 0;
@@ -41,6 +40,8 @@ static void	setup_packet(t_list *list, struct iovec *iov, char *recv_buffer)
 
 
 
+
+
 int sending_packets(t_list *list)
 {
 	int bytes = 0;
@@ -49,12 +50,32 @@ int sending_packets(t_list *list)
 
 	setup_packet(list, iov, recv_buffer);
 
+	signal(SIGINT, signal_handler);
+	signal(SIGABRT, signal_handler);
+	printf("PING %s (%s): %i data bytes\n", list->o_address, list->address, PING_PKT_S);
+	while (1)
+	{
+		//Sending packet
+		if (sendto(list->sockfd, &list->packet, sizeof(list->packet), 0, (struct sockaddr *)&list->dest, sizeof(list->dest)) < 0)
+			return (dprintf(2, "Error sending packet!\n"), 1);
 
-	if (sendto(list->sockfd, &list->packet, sizeof(list->packet), MSG_DONTWAIT, (struct sockaddr *)&list->dest, sizeof(list->dest)) < 0)
-		return (dprintf(2, "Error sending packet!\n"), 1);
 
-	if ((bytes = recvmsg(list->sockfd, &list->rply_hdr, 0)) < 0)
-		return (dprintf(2, "Error receiving packet!\n"), 1);
-	printf("Received %i bytes.\n", bytes);
+		//Receiving packet
+		if ((bytes = recvmsg(list->sockfd, &list->rply_hdr, 0)) < 0)
+			return (dprintf(2, "Error receiving packet!\n"), 1);
+		// printf("Received %i bytes.\n", bytes);
+		printf("%i bytes from %s: icmp_seq=%i ttl=%i time=%i ms\n", bytes, list->address, list->packet.header.icmp_hun.ih_idseq.icd_seq, 36, 0);
+		// fflush(0);
+
+
+
+		// Increment the sequence number
+		list->packet.header.icmp_hun.ih_idseq.icd_seq++;
+
+		// Recalculate the checksum since the sequence number changed
+		list->packet.header.icmp_cksum = 0;
+		list->packet.header.icmp_cksum = icmp_checksum(&list->packet, sizeof(list->packet));
+		sleep(1);
+	}
 	return (0);
 }

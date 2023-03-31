@@ -27,6 +27,7 @@ INCLUDES = $(addprefix $(HDRDIR), \
 # Add the path to your source files in the src folder
 SRCS = $(addprefix $(SRCDIR), \
 	main.c get_addr_info.c create_socket.c send_packets.c\
+	signals.c \
 )
 
 # String manipulation magic

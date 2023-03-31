@@ -5,12 +5,13 @@
 # include <sys/types.h>
 # include <sys/socket.h>
 # include <netdb.h>
-# include <strings.h>
 # include <arpa/inet.h>
 # include <stdlib.h>
 # include <netinet/in.h>
 # include <netinet/ip_icmp.h>
 # include <unistd.h>
+# include <signal.h>
+# include <string.h>
 
 // Define the Packet Constants
 // ping packet size
@@ -26,6 +27,8 @@ typedef struct s_ping_pkt
 typedef struct	s_list
 {
 	int		sockfd;
+	//Originial addr
+	char	*o_address;
 	char	*address;
 
 
@@ -43,5 +46,8 @@ int	create_socket(t_list *list);
 
 //Sending packets
 int sending_packets(t_list *list);
+
+//Signal handler
+void	signal_handler(int signum);
 
 #endif

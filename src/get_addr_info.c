@@ -15,12 +15,13 @@ int		get_addr_info(t_list *list, char *address)
 
 		bzero(buf, sizeof(buf));
 		inet_ntop(AF_INET, &temp->sin_addr, buf, 1024);
-		printf("address=[%s]\n", buf);
+		// printf("address=[%s]\n", buf);
 		if (list->address)
 			free(list->address);
 		list->address = strdup(buf);
 		if (!list->address)
 			return (dprintf(2, "Malloc failed!\n"), 1);
 	}
+	list->o_address = address;
 	return (freeaddrinfo(res), 0);
 }
