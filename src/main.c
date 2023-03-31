@@ -11,5 +11,7 @@ int main(int argc, char **argv)
 		return(2);
 	if (create_socket(&list))
 		return (3);
+	if (sending_packets(&list))
+		return (4);
 	return (0);
 }
