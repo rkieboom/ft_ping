@@ -28,8 +28,10 @@ typedef struct	s_list
 	int		sockfd;
 	char	*address;
 
+
 	struct sockaddr_in		dest;
 	t_ping_pkt				packet;
+	struct msghdr			rply_hdr;
 }				t_list;
 
 
